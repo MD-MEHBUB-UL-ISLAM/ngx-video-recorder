@@ -1,0 +1,100 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "npm",
+    "analytics": false
+  },
+  "newProjectRoot": "projects",
+  "projects": {
+    "ngx-video-recorder": {
+      "projectType": "library",
+      "root": "projects/ngx-video-recorder",
+      "sourceRoot": "projects/ngx-video-recorder/src",
+      "prefix": "ngx",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngx-video-recorder/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ngx-video-recorder/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "projects/ngx-video-recorder/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "test-app": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "projects/test-app",
+      "sourceRoot": "projects/test-app/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "projects/test-app/src/main.ts",
+            "tsConfig": "projects/test-app/tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/test-app/public"
+              }
+            ],
+            "styles": [
+              "projects/test-app/src/styles.css"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "test-app:build:production"
+            },
+            "development": {
+              "buildTarget": "test-app:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test"
+        }
+      }
+    }
+  }
+}

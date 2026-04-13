@@ -1,0 +1,288 @@
+<!-- video-recorder.component.html -->
+<div class="ngx-video-recorder" [class]="themeClass()" [style.--recorder-primary]="primaryColor()" [style.--recorder-radius]="borderRadius()">
+  
+  @if (isInitializing()) {
+    <div class="recorder-loading">
+      <div class="spinner"></div>
+      <p>Initializing camera and microphone...</p>
+    </div>
+  }
+  
+  @else {
+    <div class="recorder-container" [class.compact]="config.ui?.compact" [class.audio-only]="isAudioOnly()">
+      
+      <!-- Header -->
+      <header class="recorder-header">
+        <div class="header-left">
+          @if (questionText) {
+            <h3 class="question-text">
+              <span class="question-number">Q{{ questionNumber }}:</span>
+              {{ questionText }}
+            </h3>
+          }
+        </div>
+        
+        <div class="header-right">
+          @if (config.ui?.showDeviceSelector) {
+            <button class="icon-btn" (click)="showDeviceSelector.set(!showDeviceSelector())" title="Select devices">
+              <svg viewBox="0 0 24 24" width="20" height="20">
+                <path fill="currentColor" d="M20 5h-3.2l-1.6-2h-6.4L7.2 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2z"/>
+              </svg>
+            </button>
+          }
+          
+          <button class="icon-btn close-btn" (click)="deleteRecording()" title="Close">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+      
+      <!-- Device Selector Panel -->
+      @if (showDeviceSelector()) {
+        <div class="device-selector" clickOutside (clickOutside)="showDeviceSelector.set(false)">
+          <h4>Select Devices</h4>
+          
+          @if (!isAudioOnly()) {
+            <div class="device-group">
+              <label>Camera</label>
+              <select [(ngModel)]="selectedCamera" (change)="switchCamera(selectedCamera())">
+                @for (device of availableDevices() | filterDevice:'videoinput'; track device.deviceId) {
+                  <option [value]="device.deviceId">{{ device.label || 'Camera ' + ($index + 1) }}</option>
+                }
+              </select>
+            </div>
+          }
+          
+          <div class="device-group">
+            <label>Microphone</label>
+            <select [(ngModel)]="selectedMicrophone" (change)="switchMicrophone(selectedMicrophone())">
+              @for (device of availableDevices() | filterDevice:'audioinput'; track device.deviceId) {
+                <option [value]="device.deviceId">{{ device.label || 'Microphone ' + ($index + 1) }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      }
+      
+      <!-- Video/Audio Preview Area -->
+      <div class="preview-container">
+        @if (!hasRecorded()) {
+          <!-- Live Preview -->
+          @if (!isAudioOnly()) {
+            <video #videoPreview 
+                   autoplay 
+                   muted 
+                   playsinline
+                   [class.mirrored]="config.video?.facingMode === 'user'"
+                   class="preview-video">
+            </video>
+          }
+          
+          @if (isAudioOnly()) {
+            <div class="audio-preview">
+              <div class="audio-visualization-container">
+                <canvas #audioVisualization class="audio-visualization"></canvas>
+              </div>
+              <p class="audio-preview-text">🎤 Microphone active</p>
+            </div>
+          }
+          
+          <!-- Camera/Mic Off Overlay -->
+          @if (isCameraOff() || isMicMuted()) {
+            <div class="device-off-overlay">
+              <div class="off-message">
+                @if (isCameraOff() && isMicMuted()) {
+                  <span>Camera and Microphone are off</span>
+                } @else if (isCameraOff()) {
+                  <span>Camera is off</span>
+                } @else if (isMicMuted()) {
+                  <span>Microphone is off</span>
+                }
+              </div>
+            </div>
+          }
+          
+          <!-- Recording Timer -->
+          @if (isRecording()) {
+            <div class="recording-timer" [class.warning]="remainingTime() < 10000">
+              <span class="recording-indicator"></span>
+              {{ elapsedTime() | timeFormat }} / {{ maxDuration() | timeFormat }}
+            </div>
+          }
+          
+        } @else {
+          <!-- Recorded Preview with Playback -->
+          @if (!isAudioOnly()) {
+            <video #recordedVideo 
+                   [src]="videoUrl()" 
+                   [poster]="thumbnail()"
+                   (timeupdate)="onPlaybackTimeUpdate()"
+                   (loadedmetadata)="onPlaybackLoaded()"
+                   (ended)="onPlaybackEnded()"
+                   class="preview-video">
+            </video>
+          } @else {
+            <div class="audio-playback-container">
+              <audio #recordedAudio 
+                     [src]="videoUrl()"
+                     (timeupdate)="onPlaybackTimeUpdate()"
+                     (loadedmetadata)="onPlaybackLoaded()"
+                     (ended)="onPlaybackEnded()"
+                     class="hidden-audio">
+              </audio>
+              <div class="audio-playback-visual">
+                <div class="audio-waveform">
+                  @for (bar of [1,2,3,4,5,6,7,8,9,10]; track bar) {
+                    <div class="wave-bar" [class.active]="isPlaying()"></div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+          
+          <!-- Playback Controls -->
+          <div class="playback-controls">
+            <div class="playback-buttons">
+              @if (!isPlaying()) {
+                <button class="play-btn" (click)="playRecording()" title="Play">
+                  <svg viewBox="0 0 24 24" width="32" height="32">
+                    <path fill="currentColor" d="M8 5v14l11-7z"/>
+                  </svg>
+                </button>
+              } @else {
+                <button class="pause-btn" (click)="pausePlayback()" title="Pause">
+                  <svg viewBox="0 0 24 24" width="32" height="32">
+                    <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                  </svg>
+                </button>
+              }
+              <button class="stop-btn" (click)="stopPlayback()" title="Stop">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                  <path fill="currentColor" d="M6 6h12v12H6z"/>
+                </svg>
+              </button>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="playback-progress">
+              <span class="time-current">{{ formatTime(currentPlaybackTime()) }}</span>
+              <input type="range" 
+                     min="0" 
+                     [max]="playbackDuration()" 
+                     [value]="currentPlaybackTime()"
+                     (input)="seekPlayback($event)"
+                     class="progress-slider" />
+              <span class="time-duration">{{ formatTime(playbackDuration()) }}</span>
+            </div>
+          </div>
+          
+          <!-- Playback Overlay (hidden when playing) -->
+          @if (!isPlaying() && !isAudioOnly()) {
+            <div class="playback-overlay" (click)="playRecording()">
+              <button class="play-overlay-btn">
+                <svg viewBox="0 0 24 24" width="48" height="48">
+                  <path fill="white" d="M8 5v14l11-7z"/>
+                </svg>
+              </button>
+            </div>
+          }
+        }
+      </div>
+      
+      <!-- Controls Area -->
+      <div class="controls-container">
+        @if (!hasRecorded()) {
+          <div class="device-controls">
+            <button class="device-btn" 
+                    [class.active]="!isMicMuted()"
+                    [class.disabled]="!hasMicrophonePermission()"
+                    (click)="toggleMic()"
+                    title="Toggle Microphone">
+              @if (isMicMuted()) {
+                <span>🎤❌</span>
+              } @else {
+                <span>🎤</span>
+              }
+            </button>
+            
+            @if (!isAudioOnly()) {
+              <button class="device-btn"
+                      [class.active]="!isCameraOff()"
+                      [class.disabled]="!hasCameraPermission()"
+                      (click)="toggleCamera()"
+                      title="Toggle Camera">
+                @if (isCameraOff()) {
+                  <span>📷❌</span>
+                } @else {
+                  <span>📷</span>
+                }
+              </button>
+            }
+          </div>
+          
+          <div class="recording-controls">
+            @if (!isRecording()) {
+              <button class="record-btn" 
+                      [class.disabled]="!canRecord()"
+                      [disabled]="!canRecord()"
+                      (click)="startRecording()">
+                <span class="record-icon"></span>
+                <span>{{ canRecord() ? 'Start Recording' : 'Enable Devices' }}</span>
+              </button>
+            } @else {
+              <div class="recording-actions">
+                @if (config.features?.enablePause) {
+                  <button class="pause-btn" (click)="pauseRecording()">
+                    {{ isPaused() ? '▶️' : '⏸️' }}
+                  </button>
+                }
+                <button class="stop-btn" (click)="stopRecording()">
+                  <span class="stop-icon"></span>
+                </button>
+              </div>
+            }
+          </div>
+          
+        } @else {
+          <div class="post-recording-controls">
+            @if (config.features?.enableRetake) {
+              <button class="secondary-btn" (click)="reRecord()">
+                <span>🔄 Record Again</span>
+              </button>
+            }
+            
+            <button class="delete-btn" (click)="deleteRecording()">
+              <span>🗑️ Delete</span>
+            </button>
+            
+            <button class="primary-btn save-btn" 
+                    [class.disabled]="!canSave()"
+                    [disabled]="!canSave()"
+                    (click)="saveRecording()">
+              <span>💾 Save</span>
+            </button>
+          </div>
+        }
+      </div>
+      
+      <!-- Error Message -->
+      @if (errorMessage()) {
+        <div class="error-message">
+          <span>⚠️ {{ errorMessage() }}</span>
+          <button class="close-error" (click)="errorMessage.set('')">×</button>
+        </div>
+      }
+      
+      <!-- Processing Indicator -->
+      @if (isProcessing()) {
+        <div class="processing-overlay">
+          <div class="spinner"></div>
+          <p>Processing...</p>
+        </div>
+      }
+      
+    </div>
+  }
+</div>
