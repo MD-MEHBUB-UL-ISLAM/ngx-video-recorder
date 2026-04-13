@@ -1,4 +1,4 @@
-// F:\...\lib\pipes\filter-device.pipe.ts
+
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({

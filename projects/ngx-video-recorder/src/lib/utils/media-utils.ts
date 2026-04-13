@@ -1,4 +1,4 @@
-// F:\...\lib\utils\media-utils.ts
+
 export class MediaUtils {
   static async getSupportedMimeType(type: 'audio' | 'video'): Promise<string> {
     const codecs = type === 'video'

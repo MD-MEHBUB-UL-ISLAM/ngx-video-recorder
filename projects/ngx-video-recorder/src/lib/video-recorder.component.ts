@@ -1,4 +1,4 @@
-// F:\...\lib\video-recorder.component.ts
+
 import {
   Component, Input, Output, EventEmitter, ViewChild, ElementRef,
   OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef,

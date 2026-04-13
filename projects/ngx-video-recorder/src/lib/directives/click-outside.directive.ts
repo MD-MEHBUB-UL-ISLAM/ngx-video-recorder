@@ -1,4 +1,4 @@
-// F:\...\lib\directives\click-outside.directive.ts
+
 import { Directive, ElementRef, EventEmitter, HostListener, Output } from '@angular/core';
 
 @Directive({

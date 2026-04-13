@@ -1,7 +1,6 @@
-// F:\...\lib\utils\blob-utils.ts
+
 export class BlobUtils {
   static async compressVideo(blob: Blob, config?: any): Promise<Blob> {
-    // Basic compression - for production, use ffmpeg.wasm
     return blob;
   }
 

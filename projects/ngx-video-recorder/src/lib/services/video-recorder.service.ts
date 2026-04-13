@@ -1,4 +1,4 @@
-// F:\...\lib\services\video-recorder.service.ts
+
 import { Injectable } from '@angular/core';
 import { RecorderConfig, DevicePermissions } from '../interfaces/recorder-config.interface';
 import { MediaUtils } from '../utils/media-utils';

@@ -1,4 +1,4 @@
-// F:\...\lib\interfaces\recorder-config.interface.ts
+
 export interface RecorderConfig {
   maxDuration?: number;
   minDuration?: number;
