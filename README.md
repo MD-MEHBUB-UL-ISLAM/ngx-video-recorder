@@ -1,60 +1,93 @@
-# NgxVideoRecorderWorkspace
+<div align="center">
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.7.
+<img src="https://raw.githubusercontent.com/your-repo/banner.svg" alt="NGX Video Recorder Banner" width="100%" />
 
-## Development server
+# 🎥 NGX Video Recorder
 
-To start a local development server, run:
+**Professional Video/Audio Recording for Angular**
+
+[![GitHub Package](https://img.shields.io/badge/GitHub-Package-blue?logo=github)](https://github.com/MD-MEHBUB-UL-ISLAM/ngx-video-recorder/packages)
+[![Angular](https://img.shields.io/badge/Angular-16%2B-DD0031?logo=angular)](https://angular.io/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0%2B-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/your-repo/demo.gif" alt="Demo Animation" width="80%" />
+
+<br/>
+
+[✨ Features](#-features) •
+[📦 Installation](#-installation) •
+[🚀 Quick Start](#-quick-start) •
+[📖 Documentation](#-documentation) •
+[🎨 Demo](#-demo) •
+[🤝 Contributing](#-contributing)
+
+</div>
+
+---
+
+## ✨ Features
+
+<table>
+<tr>
+<td width="50%">
+
+### 🎬 Recording Modes
+- **Video Mode** - Full HD recording
+- **Audio Only** - Voice recording
+- **Dual Mode** - Both simultaneously
+- **Pause/Resume** - Mid-recording control
+- **Max Duration** - Configurable limits
+
+</td>
+<td width="50%">
+
+### 🎮 Playback Controls
+- **Play/Pause/Stop** - Full control
+- **Progress Slider** - Seek anywhere
+- **Time Display** - Current/Total duration
+- **Waveform** - Audio visualization
+- **Thumbnail** - Auto-generated preview
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 🎛️ Device Management
+- **Camera Selection** - Choose input device
+- **Microphone Selection** - Multiple mics
+- **Toggle Camera** - On/Off during preview
+- **Toggle Mic** - Mute/Unmute
+- **Permission Handling** - Auto-request
+
+</td>
+<td width="50%">
+
+### 🎨 UI/UX
+- **Glass Morphism** - Modern design
+- **Light/Dark Theme** - Auto-switch
+- **Smooth Animations** - 60fps transitions
+- **Responsive** - Mobile ready
+- **Customizable Colors** - CSS variables
+
+</td>
+</tr>
+</table>
+
+---
+
+## 📦 Installation
 
 ```bash
-ng serve
-```
+# 1. Configure GitHub Packages registry
+npm config set @md-mehbub-ul-islam:registry https://npm.pkg.github.com
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+# 2. Login (requires GitHub token with read:packages)
+npm login --registry=https://npm.pkg.github.com
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
-"# ngx-video-recorder" 
+# 3. Install the package
+npm install @md-mehbub-ul-islam/ngx-video-recorder
